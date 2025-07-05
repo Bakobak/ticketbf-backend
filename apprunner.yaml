@@ -1,0 +1,29 @@
+version: 1.0
+runtime: nodejs18
+build:
+  commands:
+    build:
+      - echo "Installing dependencies..."
+      - npm ci --only=production
+      - echo "Build completed successfully!"
+run:
+  runtime-version: 18
+  command: node server-final.js
+  network:
+    port: 3000
+    env: PORT
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: JWT_SECRET
+      value: TicketBF_Production_Secret_2024_Burkina_Secure_Key_v1
+    - name: DB_HOST
+      value: ticketmaster-burkina-db.chksqac2m7p3.eu-west-3.rds.amazonaws.com
+    - name: DB_PORT
+      value: "5432"
+    - name: DB_NAME
+      value: postgres
+    - name: DB_USER
+      value: postgres
+    - name: AWS_REGION
+      value: eu-west-3
