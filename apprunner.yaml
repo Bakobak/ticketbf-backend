@@ -1,8 +1,11 @@
 version: 1.0
-runtime: nodejs20 # Ou la version de Node.js que vous utilisez, par exemple nodejs18, nodejs16
+runtime: nodejs16
 build:
   commands:
-    - npm install
+    build:
+      - npm install
 run:
-  command: npm start # Ou la commande qui démarre votre application, par exemple node index.js
-  port: 8080 # Le port sur lequel votre application écoute. Assurez-vous que votre application écoute sur ce port.
+  runtime-version: 16
+  command: npm start
+  network:
+    port: 8080
