@@ -9,17 +9,21 @@ const JWT_SECRET = process.env.JWT_SECRET || 'ticketbf-secret-2025';
 
 // Configuration CORS TRÈS PERMISSIVE pour debug
 app.use(cors({
-    origin: '*',
+    origin: [
+        'https://main.dlfewnbbygyx.amplifyapp.com',
+        'https://*.amplifyapp.com'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['*']
 }));
 
 // Middleware pour gérer les requêtes OPTIONS (preflight)
-app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
+app.options("*", (req, res) => {
+    res.header('Access-Control-Allow-Origin', 'https://main.dlfewnbbygyx.amplifyapp.com');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
     res.sendStatus(200);
 });
 
