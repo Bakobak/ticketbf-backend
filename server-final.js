@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = 'ticketbf-secret-2025';
+const JWT_SECRET = process.env.JWT_SECRET || 'ticketbf-secret-2025';
 
 // Configuration CORS TRÈS PERMISSIVE pour debug
 app.use(cors({
@@ -30,7 +30,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     console.log('Body:', req.body);
-    console.log('Headers:', req.headers);
     next();
 });
 
@@ -38,10 +37,13 @@ app.use((req, res, next) => {
 let users = [
     {
         id: '1',
-        name: 'Admin Test',
+        firstName: 'Admin',
+        lastName: 'Test',
         email: 'admin@ticketbf.com',
-        password: '$2a$10$K8P1vJ2B3Hq9wZxYtNmO7.TQOWxKnzGVsH4P2RQ6Y8zAbCdEfGhIj', // password123
-        userType: 'admin',
+        password: 'password123',
+        phone: '+226 XX XX XX XX',
+        city: 'Ouagadougou',
+        role: 'admin',
         isVerified: true,
         createdAt: new Date().toISOString()
     }
@@ -78,31 +80,29 @@ app.get('/', (req, res) => {
     res.json({
         message: "🎟️ TicketBF - Plateforme de billetterie du Burkina Faso",
         version: "2.1.0",
-        status: "Actif - DEBUG MODE",
+        status: "Actif - API Corrigée",
         timestamp: new Date().toISOString(),
         users_count: users.length,
         events_count: events.length,
         routes: [
             "GET / - Cette page",
-            "GET /health - Test API",
-            "GET /cities - Villes BF",
-            "POST /register - Inscription",
-            "POST /login - Connexion",
-            "GET /events - Événements",
-            "POST /events - Créer événement"
+            "GET /api/health - Test API",
+            "GET /api/cities - Villes BF",
+            "POST /api/auth/register - Inscription",
+            "POST /api/auth/login - Connexion",
+            "GET /api/events - Événements"
         ]
     });
 });
 
 // ROUTE 2: SANTÉ API
-app.get('/health', (req, res) => {
-    console.log('GET /health appelé');
+app.get('/api/health', (req, res) => {
+    console.log('GET /api/health appelé');
     res.json({
         status: 'OK',
-        message: 'API fonctionne correctement',
+        message: 'API TicketBF fonctionne correctement',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-        memory: process.memoryUsage(),
         data: {
             users: users.length,
             events: events.length
@@ -111,8 +111,8 @@ app.get('/health', (req, res) => {
 });
 
 // ROUTE 3: VILLES
-app.get('/cities', (req, res) => {
-    console.log('GET /cities appelé');
+app.get('/api/cities', (req, res) => {
+    console.log('GET /api/cities appelé');
     const cities = [
         'Ouagadougou', 'Bobo-Dioulasso', 'Koudougou', 'Ouahigouya',
         'Banfora', 'Tenkodogo', 'Kaya', 'Fada N\'Gourma'
@@ -120,25 +120,51 @@ app.get('/cities', (req, res) => {
     
     res.json({
         success: true,
-        cities: cities,
+        data: { cities: cities },
         count: cities.length
     });
 });
 
-// ROUTE 4: INSCRIPTION - VERSION SIMPLE
-app.post('/register', async (req, res) => {
+// ROUTE 4: INSCRIPTION AMÉLIORÉE
+app.post('/api/auth/register', async (req, res) => {
     try {
-        console.log('POST /register appelé avec:', req.body);
+        console.log('POST /api/auth/register appelé avec:', req.body);
         
-        const { name, email, password, userType = 'user' } = req.body;
+        const { 
+            firstName, 
+            lastName, 
+            email, 
+            phone, 
+            city, 
+            password, 
+            role, 
+            companyName, 
+            businessType 
+        } = req.body;
 
-        // Validation simple
-        if (!name || !email || !password) {
+        // Validation des champs obligatoires
+        if (!firstName || !lastName || !email || !phone || !city || !password) {
             console.log('Validation échouée - champs manquants');
             return res.status(400).json({
                 success: false,
-                message: 'Nom, email et mot de passe requis',
-                received: { name: !!name, email: !!email, password: !!password }
+                message: 'Tous les champs obligatoires doivent être remplis'
+            });
+        }
+
+        // Validation du mot de passe
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le mot de passe doit contenir au moins 6 caractères'
+            });
+        }
+
+        // Validation email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Veuillez entrer un email valide'
             });
         }
 
@@ -148,30 +174,43 @@ app.post('/register', async (req, res) => {
             console.log('Email déjà utilisé:', email);
             return res.status(400).json({
                 success: false,
-                message: 'Cet email est déjà utilisé'
+                message: 'Un utilisateur avec cet email existe déjà'
             });
         }
 
-        // Créer utilisateur sans hash pour debug
+        // Validation spécifique aux promoteurs
+        if (role === 'promoter' && (!companyName || !businessType)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Les informations d\'entreprise sont requises pour les promoteurs'
+            });
+        }
+
+        // Créer utilisateur
         const newUser = {
             id: (users.length + 1).toString(),
-            name: name.trim(),
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
             email: email.toLowerCase().trim(),
-            password: password, // Pas de hash pour debug
-            userType: userType,
+            phone: phone.trim(),
+            city: city.trim(),
+            password: password, // En production, hasher le mot de passe
+            role: role || 'user',
+            companyName: companyName || null,
+            businessType: businessType || null,
             isVerified: true, // Auto-vérifié pour debug
             createdAt: new Date().toISOString()
         };
 
         users.push(newUser);
-        console.log('Utilisateur créé:', { id: newUser.id, email: newUser.email });
+        console.log('Utilisateur créé:', { id: newUser.id, email: newUser.email, role: newUser.role });
 
-        // Générer token simple
+        // Générer token
         const token = jwt.sign(
             { 
                 userId: newUser.id, 
                 email: newUser.email, 
-                userType: newUser.userType 
+                role: newUser.role 
             },
             JWT_SECRET,
             { expiresIn: '7d' }
@@ -179,14 +218,21 @@ app.post('/register', async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Inscription réussie !',
-            token: token,
-            user: {
-                id: newUser.id,
-                name: newUser.name,
-                email: newUser.email,
-                userType: newUser.userType,
-                isVerified: newUser.isVerified
+            message: `Bienvenue sur TicketBF, ${firstName} ! Votre compte a été créé avec succès.`,
+            data: {
+                user: {
+                    id: newUser.id,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    email: newUser.email,
+                    phone: newUser.phone,
+                    city: newUser.city,
+                    role: newUser.role,
+                    companyName: newUser.companyName,
+                    businessType: newUser.businessType,
+                    isVerified: newUser.isVerified
+                },
+                token: token
             }
         });
 
@@ -194,16 +240,16 @@ app.post('/register', async (req, res) => {
         console.error('Erreur inscription:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur serveur: ' + error.message,
-            stack: error.stack
+            message: 'Erreur lors de l\'inscription',
+            error: error.message
         });
     }
 });
 
-// ROUTE 5: CONNEXION - VERSION SIMPLE
-app.post('/login', async (req, res) => {
+// ROUTE 5: CONNEXION AMÉLIORÉE
+app.post('/api/auth/login', async (req, res) => {
     try {
-        console.log('POST /login appelé avec:', req.body);
+        console.log('POST /api/auth/login appelé avec:', req.body);
         
         const { email, password } = req.body;
 
@@ -236,7 +282,7 @@ app.post('/login', async (req, res) => {
             { 
                 userId: user.id, 
                 email: user.email, 
-                userType: user.userType 
+                role: user.role 
             },
             JWT_SECRET,
             { expiresIn: '7d' }
@@ -244,14 +290,21 @@ app.post('/login', async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Connexion réussie !',
-            token: token,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                userType: user.userType,
-                isVerified: user.isVerified
+            message: `Bienvenue de retour, ${user.firstName} !`,
+            data: {
+                user: {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    phone: user.phone,
+                    city: user.city,
+                    role: user.role,
+                    companyName: user.companyName,
+                    businessType: user.businessType,
+                    isVerified: user.isVerified
+                },
+                token: token
             }
         });
 
@@ -259,74 +312,34 @@ app.post('/login', async (req, res) => {
         console.error('Erreur connexion:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur serveur: ' + error.message
+            message: 'Erreur lors de la connexion',
+            error: error.message
         });
     }
 });
 
 // ROUTE 6: ÉVÉNEMENTS
-app.get('/events', (req, res) => {
-    console.log('GET /events appelé');
+app.get('/api/events', (req, res) => {
+    console.log('GET /api/events appelé');
     res.json({
         success: true,
-        events: events,
+        data: events,
         total: events.length
     });
 });
 
-// ROUTE 7: CRÉER ÉVÉNEMENT
-app.post('/events', (req, res) => {
-    try {
-        console.log('POST /events appelé avec:', req.body);
-        
-        const { name, description, date, location, price, category } = req.body;
-
-        if (!name || !date || !location || !price) {
-            return res.status(400).json({
-                success: false,
-                message: 'Nom, date, lieu et prix requis'
-            });
-        }
-
-        const newEvent = {
-            id: (events.length + 1).toString(),
-            name,
-            description: description || '',
-            date,
-            location,
-            price: parseFloat(price),
-            category: category || 'other',
-            createdBy: 'system',
-            createdAt: new Date().toISOString()
-        };
-
-        events.push(newEvent);
-
-        res.status(201).json({
-            success: true,
-            message: 'Événement créé !',
-            event: newEvent
-        });
-
-    } catch (error) {
-        console.error('Erreur création événement:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Erreur serveur: ' + error.message
-        });
-    }
-});
-
-// ROUTE 8: LISTE UTILISATEURS (DEBUG)
-app.get('/users', (req, res) => {
-    console.log('GET /users appelé');
+// ROUTE 7: LISTE UTILISATEURS (DEBUG)
+app.get('/api/users', (req, res) => {
+    console.log('GET /api/users appelé');
     res.json({
         success: true,
-        users: users.map(u => ({
+        data: users.map(u => ({
             id: u.id,
-            name: u.name,
+            firstName: u.firstName,
+            lastName: u.lastName,
             email: u.email,
-            userType: u.userType,
+            role: u.role,
+            city: u.city,
             isVerified: u.isVerified,
             createdAt: u.createdAt
         })),
@@ -340,8 +353,7 @@ app.use((error, req, res, next) => {
     res.status(500).json({
         success: false,
         message: 'Erreur interne du serveur',
-        error: error.message,
-        stack: error.stack
+        error: error.message
     });
 });
 
@@ -353,13 +365,12 @@ app.use('*', (req, res) => {
         message: `Route ${req.method} ${req.path} non trouvée`,
         available_routes: [
             'GET /',
-            'GET /health',
-            'GET /cities',
-            'POST /register',
-            'POST /login',
-            'GET /events',
-            'POST /events',
-            'GET /users'
+            'GET /api/health',
+            'GET /api/cities',
+            'POST /api/auth/register',
+            'POST /api/auth/login',
+            'GET /api/events',
+            'GET /api/users'
         ]
     });
 });
@@ -367,11 +378,17 @@ app.use('*', (req, res) => {
 // Démarrage serveur
 app.listen(PORT, () => {
     console.log(`🚀 TicketBF Backend démarré sur port ${PORT}`);
-    console.log(`📱 Frontend: https://main.dlfewnbbygyx.amplifyapp.com`);
-    console.log(`🔧 Mode DEBUG activé`);
+    console.log(`📱 Frontend: https://main.difewvnbygxxx.amplifyapp.com`);
+    console.log(`🔧 Mode DEBUG activé - Routes /api/ corrigées`);
     console.log(`👥 Utilisateurs: ${users.length}`);
     console.log(`🎪 Événements: ${events.length}`);
     console.log(`📧 Test login: admin@ticketbf.com / password123`);
+    console.log(`📋 Routes disponibles:`);
+    console.log(`   GET /api/health`);
+    console.log(`   GET /api/cities`);
+    console.log(`   POST /api/auth/register`);
+    console.log(`   POST /api/auth/login`);
+    console.log(`   GET /api/events`);
 });
 
 module.exports = app;
