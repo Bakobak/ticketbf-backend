@@ -9,27 +9,16 @@ const User = require('./src/models/UserSimple');
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
-app.use(express.json());
-
-// Page d'accueil avec documentation
-app.get('/', (req, res) => {
-  res.json({
-    message: '🎟️ TicketBF - Plateforme de billetterie du Burkina Faso',
-    version: '1.0.0',
-    status: 'Actif',
-    routes: [
-      'GET / - Cette page',
-      'GET /health - Test base de données',
-      'GET /cities - Villes du Burkina Faso',
-      'POST /register - Inscription utilisateur',
-      'POST /login - Connexion utilisateur',
-      'GET /profile - Profil utilisateur (avec token)',
-      'GET /events - Liste des événements',
-      'POST /events - Créer un événement (avec token)'
-    ]
-  });
-});
+app.use(cors({
+    origin: [
+        'https://main.dlfewnbbygyx.amplifyapp.com',
+        'http://localhost:3000',
+        'https://*.amplifyapp.com'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Test de santé
 app.get('/health', async (req, res) => {
