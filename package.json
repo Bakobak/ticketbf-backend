@@ -1,20 +1,29 @@
 {
   "name": "ticketbf-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "description": "Backend complet pour TicketBF - Plateforme de billetterie du Burkina Faso",
   "main": "server-final.js",
   "scripts": {
-    "start": "node server-final.js"
+    "start": "node server-final.js",
+    "dev": "nodemon server-final.js",
+    "test": "echo \"Tests à venir\" && exit 0"
   },
+  "keywords": ["ticketing", "burkina-faso", "events", "concerts"],
+  "author": "TicketBF Team",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.0",
-    "dotenv": "^16.0.3",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
-    "sequelize": "^6.32.1",
-    "mysql2": "^3.6.0",
-    "pg": "^8.11.3",
-    "sqlite3": "^5.1.6"
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.7",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
