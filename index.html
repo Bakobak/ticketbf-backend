@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketBF - Billets de Concert, Théâtre et Sport | Burkina Faso</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            background: linear-gradient(90deg, #009639, #ce1126);
+            color: #fff;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-main {
+            padding: 15px 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ce1126;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: "🇧🇫";
+            font-size: 24px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 10px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #ce1126;
+            border-bottom-color: #ce1126;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #ce1126;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #a50e1c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ce1126;
+            border: 2px solid #ce1126;
+        }
+
+        .btn-secondary:hover {
+            background: #ce1126;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 150, 57, 0.8), rgba(206, 17, 38, 0.8));
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 50px;
+            padding: 10px;
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            background: transparent;
+            outline: none;
+            color: #333;
+        }
+
+        .search-box button {
+            background: #ce1126;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: #a50e1c;
+        }
+
+        /* Categories */
+        .categories {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-top: 4px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card.concerts {
+            border-top-color: #e74c3c;
+        }
+
+        .category-card.theater {
+            border-top-color: #9b59b6;
+        }
+
+        .category-card.sports {
+            border-top-color: #27ae60;
+        }
+
+        .category-card.festivals {
+            border-top-color: #f39c12;
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .concerts .category-icon {
+            color: #e74c3c;
+        }
+
+        .theater .category-icon {
+            color: #9b59b6;
+        }
+
+        .sports .category-icon {
+            color: #27ae60;
+        }
+
+        .festivals .category-icon {
+            color: #f39c12;
+        }
+
+        .category-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .category-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Featured Events */
+        .featured-events {
+            padding: 60px 0;
+            background: #f8f9fa;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-image {
+            height: 200px;
+            background: linear-gradient(45deg, #ce1126, #009639);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .event-info {
+            padding: 25px;
+        }
+
+        .event-date {
+            background: #ce1126;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .event-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .event-venue {
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ce1126;
+            margin-bottom: 15px;
+        }
+
+        /* Ad Banners */
+        .ad-banner {
+            background: linear-gradient(45deg, #ffc72c, #009639, #ce1126);
+            background-size: 600% 600%;
+            animation: gradientMove 8s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes gradientMove {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .floating-ad {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #ce1126, #ffc72c);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        .floating-ad:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Cities Section */
+        .cities-section {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .city-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .city-card:hover {
+            border-color: #ce1126;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 50px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer h3 {
+            margin-bottom: 20px;
+            color: #ffc72c;
+        }
+
+        .footer ul {
+            list-style: none;
+        }
+
+        .footer ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer ul li a:hover {
+            color: #ffc72c;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-indicator.error {
+            background: #e74c3c;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+
+            .search-box input {
+                margin-bottom: 10px;
+                border-radius: 10px;
+            }
+
+            .search-box button {
+                border-radius: 10px;
+            }
+
+            .floating-ad {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body><!-- Status Indicator -->
+    <div class="status-indicator" id="statusIndicator">🔄 Connexion &agrave; l&apos;API...</div><!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <div>🌟 Premi&egrave;re ********** de billetterie du ******* Faso</div>
+                <div>📞 +226 ** XX XX XX | 📧 contact@ticketbf.com</div>
+            </div>
+        </div>
+        <div class="header-main">
+            <nav class="nav-container"><a href="#" class="logo">TicketBF</a>
+                <ul class="nav-menu">
+                    <li><a href="#" class="active">Accueil</a></li>
+                    <li><a href="#events">&Eacute;v&eacute;nements</a></li>
+                    <li><a href="#concerts">Concerts</a></li>
+                    <li><a href="#sports">Sports</a></li>
+                    <li><a href="#theater">Th&eacute;&acirc;tre</a></li>
+                    <li><a href="#cities">Villes</a></li>
+                </ul>
+                <div class="user-actions"><a href="#" class="btn btn-secondary">&nbsp; Connexion&nbsp;</a> <a href="#" class="btn btn-primary">&nbsp; Inscription&nbsp;</a></div>
+            </nav>
+        </div>
+    </header><!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>D&eacute;couvrez les ********* &Eacute;v&eacute;******* du Burkina Faso</h1>
+            <p>Concerts, spectacles, sports ** festivals - R&eacute;servez *** ******* ** quelques clics</p>
+            <div class="search-box"><input type="text" placeholder="Rechercher un événement, artiste, ou lieu..." id="searchInput"> <button>&nbsp; Rechercher&nbsp;</button></div>
+        </div>
+    </section><!-- Ad Banner -->
+    <div class="ad-banner" id="topAdBanner">🎉 Festival de la ******* Burkinab&egrave; - 15-17 D&eacute;cembre 2025 | ***** ** 4-Ao&ucirc;t</div><!-- Categories -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-title">
+                <h2>Explorez par Cat&eacute;gorie</h2>
+                <p>Trouvez l&apos;&eacute;v&eacute;nement ******* selon vos go&ucirc;ts</p>
+            </div>
+            <div class="category-grid">
+                <div class="category-card concerts">
+                    <div class="category-icon">🎵</div>
+                    <h3>Concerts</h3>
+                    <p>******* traditionnelle, afrobeat, reggae et **** encore</p><a href="#" class="btn btn-primary">Explorer</a>
+                </div>
+                <div class="category-card theater">
+                    <div class="category-icon">🎭</div>
+                    <h3>Th&eacute;&acirc;*** &amp; Culture</h3>
+                    <p>Pi&egrave;ces de th&eacute;&acirc;tre, contes traditionnels et spectacles culturels</p><a href="#" class="btn btn-primary">Explorer</a>
+                </div>
+                <div class="category-card sports">
+                    <div class="category-icon">⚽</div>
+                    <h3>Sports</h3>
+                    <p>Football, basketball ** comp&eacute;titions sportives nationales</p><a href="#" class="btn btn-primary">Explorer</a>
+                </div>
+                <div class="category-card festivals">
+                    <div class="category-icon">🎪</div>
+                    <h3>Festivals</h3>
+                    <p>FESPACO, SNC, festivals ** danse et &eacute;v&eacute;nements culturels</p><a href="#" class="btn btn-primary">Explorer</a>
+                </div>
+            </div>
+        </div>
+    </section><!-- Featured Events -->
+    <section class="featured-events" id="events">
+        <div class="container">
+            <div class="section-title">
+                <h2>&Eacute;v&eacute;nements Populaires</h2>
+                <p>Ne manquez pas ces &eacute;v&eacute;nements exceptionnels</p>
+            </div>
+            <div class="events-grid" id="eventsGrid"><!-- Sample Events -->
+                <div class="event-card">
+                    <div class="event-image">🎵</div>
+                    <div class="event-info">
+                        <div class="event-date">15 JUL 2025</div>
+                        <h3 class="event-title">Concert de Floby</h3>
+                        <div class="event-venue">Palais des ****** de Ouaga</div>
+                        <div class="event-price">5 000 FCFA</div><a href="#" class="btn btn-primary">&nbsp; R&eacute;server&nbsp;</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image">⚽</div>
+                    <div class="event-info">
+                        <div class="event-date">12 JUL 2025</div>
+                        <h3 class="event-title">&Eacute;toile Filante ** **** Yennega</h3>
+                        <div class="event-venue">Stade du 4-Ao&ucirc;t</div>
+                        <div class="event-price">1 *** FCFA</div><a href="#" class="btn btn-primary">&nbsp; R&eacute;server&nbsp;</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image">🎪</div>
+                    <div class="event-info">
+                        <div class="event-date">20 JUL 2025</div>
+                        <h3 class="event-title">Festival de ***** Traditionnelle</h3>
+                        <div class="event-venue">Maison du Peuple</div>
+                        <div class="event-price">3 *** FCFA</div><a href="#" class="btn btn-primary">&nbsp; R&eacute;server&nbsp;</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image">🎭</div>
+                    <div class="event-info">
+                        <div class="event-date">18 JUL 2025</div>
+                        <h3 class="event-title">Th&eacute;&acirc;tre: Les ****** de Naaba</h3>
+                        <div class="event-venue">Centre ******** Fran&ccedil;ais</div>
+                        <div class="event-price">2 500 FCFA</div><a href="#" class="btn btn-primary">&nbsp; R&eacute;server&nbsp;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section><!-- Cities Section -->
+    <section class="cities-section" id="cities">
+        <div class="container">
+            <div class="section-title">
+                <h2>&Eacute;v&eacute;******* par Ville</h2>
+                <p>D&eacute;couvrez *** &eacute;v&eacute;nements dans votre r&eacute;gion</p>
+            </div>
+            <div class="cities-grid" id="citiesGrid">
+                <div class="city-card">
+                    <h3>Ouagadougou</h3>
+                    <p>**** les &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Bobo-Dioulasso</h3>
+                    <p>**** les &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Koudougou</h3>
+                    <p>Voir *** &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Ouahigouya</h3>
+                    <p>Voir les &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Banfora</h3>
+                    <p>Voir *** &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Tenkodogo</h3>
+                    <p>Voir les &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Kaya</h3>
+                    <p>Voir les &eacute;v&eacute;nements</p>
+                </div>
+                <div class="city-card">
+                    <h3>Fada N&apos;Gourma</h3>
+                    <p>Voir les &eacute;v&eacute;nements</p>
+                </div>
+            </div>
+        </div>
+    </section><!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h3>TicketBF</h3>
+                    <p>La premi&egrave;** plateforme ** billetterie ** ligne du Burkina Faso. R&eacute;servez *** places **** **** les &eacute;v&eacute;nements du pays.</p>
+                    <div style="margin-top: 20px;"><br></div>
+                </div>
+                <div>
+                    <h3>&Eacute;v&eacute;nements</h3>
+                    <ul>
+                        <li><a href="#">Concerts</a></li>
+                        <li><a href="#">Th&eacute;&acirc;tre</a></li>
+                        <li><a href="#">Sports</a></li>
+                        <li><a href="#">Festivals</a></li>
+                        <li><a href="#">Conf&eacute;rences</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Villes</h3>
+                    <ul>
+                        <li><a href="#">Ouagadougou</a></li>
+                        <li><a href="#">Bobo-Dioulasso</a></li>
+                        <li><a href="#">Koudougou</a></li>
+                        <li><a href="#">Ouahigouya</a></li>
+                        <li><a href="#">Banfora</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Centre d&apos;aide</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">CGV</a></li>
+                        <li><a href="#">********* de confidentialit&eacute;</a></li>
+                        <li><a href="#">Remboursements</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TicketBF. Tous droits r&eacute;serv&eacute;s. Fi&egrave;rement burkinab&egrave; 🇧🇫</p>
+            </div>
+        </div>
+    </footer><!-- Floating Ad -->
+    <div class="floating-ad">💫 Offre sp&eacute;ciale !</div>
+    <script>
+        // Votre URL API
+        const API_BASE = 'https://dzwpmucw8e.eu-west-3.awsapprunner.com';
+        
+        // Vérification de l'API
+        window.onload = function() {
+            checkAPIStatus();
+            rotateAdBanner();
+        };
+        
+        async function checkAPIStatus() {
+            try {
+                const response = await fetch(API_BASE);
+                const data = await response.json();
+                
+                const indicator = document.getElementById('statusIndicator');
+                if (response.ok) {
+                    indicator.innerHTML = '✅ API Connectée';
+                    indicator.classList.remove('error');
+                } else {
+                    indicator.innerHTML = '❌ API Déconnectée';
+                    indicator.classList.add('error');
+                }
+            } catch (error) {
+                const indicator = document.getElementById('statusIndicator');
+                indicator.innerHTML = '❌ Erreur de connexion';
+                indicator.classList.add('error');
+            }
+        }
+        
+        function searchEvents() {
+            const searchTerm = document.getElementById('searchInput').value;
+            if (searchTerm.trim()) {
+                alert(`🔍 Recherche de: "${searchTerm}"\n\nCette fonctionnalité sera connectée à votre API !`);
+            }
+        }
+        
+        // Rotation des publicités
+        const adMessages = [
+            '🎵 Concert de Floby ce weekend !',
+            '🏆 Finale de football au Stade du 4-Août',
+            '🎭 Festival de théâtre - Réductions disponibles',
+            '🎪 FESPACO 2025 - Réservez maintenant',
+            '🥁 Soirée djembé traditionnel',
+            '⚽ Étoile Filante vs ASFA Yennega',
+            '🎨 Exposition d\'art contemporain burkinabè'
+        ];
+        
+        let currentAdIndex = 0;
+        
+        function rotateAdBanner() {
+            const banner = document.getElementById('topAdBanner');
+            currentAdIndex = (currentAdIndex + 1) % adMessages.length;
+            banner.textContent = adMessages[currentAdIndex];
+            setTimeout(rotateAdBanner, 4000);
+        }
+        
+        function rotateFloatingAd() {
+            const floatingAd = document.querySelector('.floating-ad');
+            const messages = ['💫 Clic moi !', '🎉 Offre spéciale !', '🎵 Nouveau !', '⭐ Top !'];
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            floatingAd.textContent = randomMsg;
+        }
+        
+        // Auto-rotate floating ad
+        setInterval(rotateFloatingAd, 3000);
+        
+        // Simulation de réservation de billets
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            if (btn.innerHTML.includes('Réserver')) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const eventCard = this.closest('.event-card');
+                    const eventTitle = eventCard.querySelector('.event-title').textContent;
+                    const eventPrice = eventCard.querySelector('.event-price').textContent;
+                    
+                    alert(`🎫 Réservation pour: ${eventTitle}\n💰 Prix: ${eventPrice}\n\n🚀 Bientôt: Paiement Orange Money et Moov Money !`);
+                });
+            }
+        });
+        
+        // Animation au scroll
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.event-card, .category-card, .city-card');
+            
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].style.opacity = '1';
+                    reveals[i].style.transform = 'translateY(0)';
+                }
+            }
+        }
+        
+        window.addEventListener('scroll', revealOnScroll);
+        
+        // Style initial pour l'animation
+        document.querySelectorAll('.event-card, .category-card, .city-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+        });
+        
+        // Révéler immédiatement les éléments visibles
+        setTimeout(revealOnScroll, 100);
+    </script>
+
+<div style="color: red">Word to HTML trial - please <a href="https://wordtohtml.net/site/payment">Go PRO</a> to get whole HTML.</div>
+</body>
+
+</html>
